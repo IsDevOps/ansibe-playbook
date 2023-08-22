@@ -1,0 +1,28 @@
+---
+- name: Deploy CMS on Docker Swarm
+  hosts: swarm_nodes
+  become: true
+  tasks:
+    - name: Install required packages
+      apt:
+        name: ['docker.io', 'docker-compose']
+        state: present
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+
+    - name: Create CMS Stack Directory
+      file:
+        path: /path/to/wordpress
+        state: directory
+
+    - name: Copy Docker Compose file
+      copy:
+        src: docker-compose.yml
+        dest: /path/to/wordpress/docker-compose.yml
+
+    - name: Deploy CMS Stack
+      command: docker stack deploy -c /path/to/wordpress/docker-compose.yml cms
